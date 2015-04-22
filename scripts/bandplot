@@ -195,7 +195,7 @@ for i, filename in enumerate(filenames):
             print "%10.8f" % v,
         print "%10.8f" % distances[-1]
         
-    elif options.is_vertial_line and len(filenames) == 1:
+    elif options.is_vertial_line:
         for v in segment_positions[1:]:
             plt.axvline(x=v, linewidth=0.5, color='b')
 
