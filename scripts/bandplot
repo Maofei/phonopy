@@ -133,6 +133,9 @@ parser.add_option("-o", "--output", dest="output_filename",
 parser.add_option("--segment_scales", dest="segment_scales",
                   action="store", type="string",
                   help="Scale band segments")
+parser.add_option("--lattice_scales", dest="lattice_scales",
+                  action="store", type="string",
+                  help="Scale different files with different lattice constant")
 parser.add_option("--xlabel", dest="xlabel", action="store", type="string",
                   help="Specify x-label")
 parser.add_option("--ylabel", dest="ylabel", action="store", type="string",
