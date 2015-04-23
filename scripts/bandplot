@@ -133,6 +133,9 @@ parser.add_option("-o", "--output", dest="output_filename",
 parser.add_option("--segment_scales", dest="segment_scales",
                   action="store", type="string",
                   help="Scale band segments")
+parser.add_option("--file_scales", dest="file_scales",
+                  action="store", type="string",
+                  help="Scales for different phonon band files calculated under different circumstances")
 parser.add_option("--xlabel", dest="xlabel", action="store", type="string",
                   help="Specify x-label")
 parser.add_option("--ylabel", dest="ylabel", action="store", type="string",
@@ -179,6 +182,11 @@ if options.segment_scales:
     segment_scales = [float(x) for x in options.segment_scales.split()]
 else:
     segment_scales = None
+    
+if options.file_scales:
+    file_scales = [float(x) for x in options.file_scales.split()]
+else:
+    file_scales = None
 
 if options.dos:
     dos_frequencies, dos = read_dos_dat(options.dos)
