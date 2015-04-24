@@ -51,7 +51,7 @@ except ImportError:
 
 from phonopy.units import VaspToTHz
 
-def read_band_yaml(filename, segment_scales=None):
+def read_band_yaml(filename, i, segment_scales=None, lattice_scales=None):
     data = yaml.load(open(filename), Loader=Loader)
     segment_positions = []
     frequencies = []
@@ -63,14 +63,20 @@ def read_band_yaml(filename, segment_scales=None):
 
     for j, v in enumerate(data['phonon']):
         if j % npoints == 0:
-            segment_positions.append(distance)
+	    if lattice_scales is not None:
+            	segment_positions.append(distance*lattice_scales[i])
+	    else:
+		segment_positions.append(distance)
             if segment_scales is not None:
                 distance_scale = segment_scales[len(segment_positions) - 1]
 
         frequencies.append([f['frequency'] for f in v['band']])
         delta = v['distance'] - prev_distance
         distance += delta * distance_scale
-        distances.append(distance)
+	if lattice_scales is not None:
+        	distances.append(distance*lattice_scales[i])
+        else:
+        	distances.append(distance)
         prev_distance = v['distance']
 
     return distances, frequencies, segment_positions
@@ -101,6 +107,7 @@ parser.set_defaults(band_labels=None,
                     is_vertial_line=False,
                     output_filename=None,
                     segment_scales=None,
+		    lattice_scales=None,
                     xlabel=None,
                     ylabel=None,
                     show_legend=False,
@@ -133,9 +140,9 @@ parser.add_option("-o", "--output", dest="output_filename",
 parser.add_option("--segment_scales", dest="segment_scales",
                   action="store", type="string",
                   help="Scale band segments")
-parser.add_option("--file_scales", dest="file_scales",
+parser.add_option("--lattice_scales", dest="lattice_scales",
                   action="store", type="string",
-                  help="Scales for different phonon band files calculated under different circumstances")
+                  help="Scales for different phonon band files calculated under different lattice constants for cubic phases")
 parser.add_option("--xlabel", dest="xlabel", action="store", type="string",
                   help="Specify x-label")
 parser.add_option("--ylabel", dest="ylabel", action="store", type="string",
@@ -182,20 +189,21 @@ if options.segment_scales:
     segment_scales = [float(x) for x in options.segment_scales.split()]
 else:
     segment_scales = None
-    
-if options.file_scales:
-    file_scales = [float(x) for x in options.file_scales.split()]
-else:
-    file_scales = None
 
+if options.lattice_scales:
+    lattice_scales = [float(y) for y in options.lattice_scales.split()]
+else:
+    lattice_scales = None
+	
 if options.dos:
     dos_frequencies, dos = read_dos_dat(options.dos)
 
 for i, filename in enumerate(filenames):
     (distances,
      frequencies,
-     segment_positions) = read_band_yaml(filename,
-                                         segment_scales=segment_scales)
+     segment_positions) = read_band_yaml(filename,i,
+                                         segment_scales=segment_scales,
+					 lattice_scales=lattice_scales)
 
     if options.is_gnuplot:
         print "# segments:",
